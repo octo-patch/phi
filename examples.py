@@ -78,8 +78,8 @@ agent = pv.Agent(toolchain = "responses, history = minimax_api(prompt, history)"
 agent('Write a neurology ICU admission note')
 agent.end()
 
-### Selecting a MiniMax model (MiniMax-M3 is the default; MiniMax-M2.7 is also available)
-agent = pv.Agent(toolchain = 'responses, history = minimax_api(prompt, history, api_model="MiniMax-M2.7")')
+### Selecting a MiniMax model (MiniMax-M3.1-Flash is the default; MiniMax-M3 is also available)
+agent = pv.Agent(toolchain = "responses, history = minimax_api(prompt, history)", api_model="MiniMax-M3")
 agent('Write a neurology ICU admission note')
 agent.end()
 

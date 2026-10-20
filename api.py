@@ -4,15 +4,18 @@ from pathlib import Path
 import requests
 from huggingface_hub import InferenceClient
 
-MINIMAX_MODELS = ("MiniMax-M3", "MiniMax-M2.7")
+MINIMAX_MODELS = ("MiniMax-M3.1-Flash", "MiniMax-M3")
 
 MINIMAX_BASE_URLS = {
     "global_en": "https://api.minimax.io/v1",
     "cn_zh": "https://api.minimaxi.com/v1",
 }
 
-def minimax_api(prompt, history, verbose=True, return_dict=True, api_model="MiniMax-M3", region="global_en"):
+def minimax_api(prompt, history, verbose=True, return_dict=True, api_model=MINIMAX_MODELS[0], region="global_en"):
     """
+    Use MiniMax-M3.1-Flash by default, or pass an explicit model ID.
+    MINIMAX_MODELS lists current choices; legacy and custom IDs remain accepted.
+
     Example:
     --------
     agent = Agent(toolchain = "responses, history = minimax_api(prompt, history)")
@@ -37,8 +40,10 @@ def minimax_api(prompt, history, verbose=True, return_dict=True, api_model="Mini
         ),
     )
     response.raise_for_status()
-    result = response.json()["choices"][0]["message"]["content"].strip()
-    history = history + [{"role": "assistant", "content": result}]
+    message = response.json()["choices"][0]["message"]
+    result = (message.get("content") or "").strip()
+    # Keep reasoning and tool-call fields intact for subsequent turns.
+    history = history + [message]
     if verbose:
         print(f'### Prompt ###\n{prompt}\n### Output ###\n{result}')
     if return_dict:
